@@ -1,0 +1,32 @@
+{% extends 'question/base.html' %}
+{% load static %}
+
+
+{% block title%}
+{{ title|truncatewords:20 }} - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex">
+  <h1 class="flex-item">
+    {{ title|truncatewords:20 }}
+  </h1>
+  <div class="flex-item-print">
+    <a href="{% url 'question_create' %}" class="ws-nowrap">
+      Ask Question
+    </a>
+  </div>
+</div>
+
+{% for que in questions %}
+{% include 'question/includes/card.html' %}
+{% endfor%}
+
+{% include 'question/includes/paginator.html' %}
+
+{% endblock %}
+
+{% block trending %}
+
+{% endblock %}

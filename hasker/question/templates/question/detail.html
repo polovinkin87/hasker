@@ -1,0 +1,132 @@
+{% extends 'question/base.html' %}
+{% load static %}
+
+{% block title%}
+{{ question.title|truncatewords:20 }} - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="mainbar">
+    <h1 class="card-title">{{ question.title|title }}</h1>
+    <div class="question">
+        <div class="post-layout">
+            <div class="votecell post-layout--left">
+                <div class="voting-container">
+                    <button class="vote-up-btn">
+                        <a href="{% url 'question_add_likes' question.slug %}">
+                            <svg aria-hidden="true" class="svg-icon" width="18" height="18" viewBox="0 0 18 18">
+                                <path d="M1 12h16L9 4l-8 8Z"></path>
+                            </svg>
+                        </a>
+                    </button>
+                    <div class="vote-count" itemprop="upvoteCount" data-value="39">
+                        {{ question.user_q_like.all.count }}
+                    </div>
+                    <button class="vote-up-btn">
+                        <a href="{% url 'question_del_likes' question.slug %}">
+                            <svg aria-hidden="true" class="svg-icon" width="18" height="18" viewBox="0 0 18 18">
+                                <path d="M1 6h16l-8 8-8-8Z"></path>
+                            </svg>
+                        </a>
+                    </button>
+                </div>
+            </div>
+            <div class="postcell">
+                <p class="post-body">{{ question.text|truncatewords:15 }}</p>
+                <div class="question-tag-list-item">
+                    {% for tag in question.tags.all %}
+                    <a href="{{ tag.get_absolute_url }}" class="tag">{{ tag.title }}</a>
+                    {% endfor %}
+                </div>
+                <div class="mb">
+                    {% if question.author.avatar %}
+                    <img src="{{ question.author.avatar.url }}" width=32 height="32" />
+                    {% else %}
+                    <img src="{% static 'img/default_avatar.jpg' %}" width=32 height="32" />
+                    {% endif %}
+                    <a href="{{ question.author.get_absolute_url }}" class="author">{{ question.author }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if answers %}
+    <div class="qa_answers">
+        <h3 class="answers_header">{{ question.answers.all.count }} Answers</h3>
+        {% for answer in answers %}
+        <div class="answers">
+            <div class="post-layout">
+                <div class="votecell post-layout--left">
+                    <div class="voting-container">
+                        <button class="vote-up-btn">
+                            <a href="{% url 'answer_add_likes' question.slug answer.pk %}">
+                                <svg aria-hidden="true" class="svg-icon" width="18" height="18" viewBox="0 0 18 18">
+                                    <path d="M1 12h16L9 4l-8 8Z"></path>
+                                </svg>
+                            </a>
+                        </button>
+                        <div class="vote-count" itemprop="upvoteCount" data-value="13">
+                            {{ answer.user_a_like.all.count }}
+                        </div>
+                        <button class="vote-up-btn">
+                            <a href="{% url 'answer_del_likes' question.slug answer.pk %}">
+                                <svg aria-hidden="true" class="svg-icon" width="18" height="18" viewBox="0 0 18 18">
+                                    <path d="M1 6h16l-8 8-8-8Z"></path>
+                                </svg>
+                            </a>
+                        </button>
+                        <div class="">
+                            {% if answer == question.correct_answer %}
+                            <svg aria-hidden="true" class="green svg-icon" width="36" height="36" viewBox="0 0 36 36">
+                                <path d="m6 14 8 8L30 6v8L14 30l-8-8v-8Z"></path>
+                            </svg>
+                            {% elif user == question.author %}
+                            <a class="a_correct" href="{% url 'correct_answer' answer.id %}"><svg aria-hidden="true" class="green svg-icon" width="36"
+                                    height="36" viewBox="0 0 36 36">
+                                    <path d="m6 14 8 8L30 6v8L14 30l-8-8v-8Z"></path>
+                                </svg></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="postcell">
+                    <p class="post-body">{{ answer.text|linebreaks }}</p>
+                    <div class="mb">
+                        <div class="answer-user-card">
+                            {% if answer.author.avatar %}
+                            <img src="{{ answer.author.avatar.url }}" width=32 height="32" />
+                            {% else %}
+                            <img src="{% static 'img/default_avatar.jpg' %}" width=32 height="32" />
+                            {% endif %}
+                            <a href="{{ answer.author.get_absolute_url }}" class="author">
+                                {{ answer.author.username }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% include 'question/includes/paginator.html' with page_obj=answers_page_obj %}
+    {% endif %}
+
+    {% if user.is_authenticated and user != question.author %}
+    <form class="" action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            {% if field.errors %}
+            <div class="alert alert-danger">
+                {{ field.errors }}
+            </div>
+            {% endif%}
+            {{ field }}
+        </div>
+        {% endfor%}
+        <button type="submit" name="button" class="btn btn-primary">Submit</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

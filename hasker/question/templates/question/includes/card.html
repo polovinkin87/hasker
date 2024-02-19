@@ -1,0 +1,45 @@
+{% load static %}
+
+<div>
+    <div class="question-summary">
+        <div class="question-summary-stats">
+            {{ que.user_q_like.all.count }} votes {{ que.answers.all.count }} answer
+        </div>
+        <div clss="question-summary-content">
+            <h3 class="question-summary-content-title">
+                <a href="{{ que.get_absolute_url }}" class="content-title">{{ que.title|title }}</a>
+            </h3>
+        </div>
+        <div class="question-summary-meta">
+            <div class="question-summary-meta-tags">
+                <ul class="question-tag-list">
+                    {% for tag in que.tags.all %}
+                    <li class="question-tag-list-item">
+                        <a href="{{ tag.get_absolute_url }}" class="tag">{{ tag.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="user-card">
+                <a href="{{ que.author.get_absolute_url }}" class="avatar">
+                    <div>
+                        {% if que.author.avatar %}
+                            <img src="{{ que.author.avatar.url }}" width="16" height="16" class="avatar-img" />
+                        {% else %}
+                            <img src="{% static 'img/default_avatar.jpg' %}" width="16" height="16" class="avatar-img" />
+                        {% endif %}
+                    </div>
+                </a>
+                <div class="user-card-info">
+                    <div>
+                        <a href="{{ que.author.get_absolute_url }}" class="user-card-link">{{ que.author }}</a>
+                    </div>
+                </div>
+                <time class="s-user-card--time">
+                    <span title="{{ que.created }}" class="relativetime">{{ que.created|timesince }} ago
+                    </span>
+                </time>
+            </div>
+        </div>
+    </div>
+</div>

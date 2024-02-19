@@ -1,0 +1,45 @@
+{% extends 'question/base.html' %}
+{% load static %}
+
+{% block title%}
+    {{ title|truncatewords:10 }} - {{ block.super }}
+{% endblock %}
+
+{% block h1 %}
+    {{ title|truncatewords:10 }}
+{% endblock %}
+
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/jquery.tagit.css' %}" type='text/css'>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'js/tag-it.js' %}" type="text/javascript" charset="utf-8"></script>
+    <script src="{% static 'js/tagit_widget.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+
+{% if request.user.is_authenticated %}
+{% block content %}
+
+<form class="" action="{% url 'question_create' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+  {% for field in form %}
+    <div class="form-group">
+      {% if field.errors %}
+        <div class="alert alert-danger">
+          {{ field.errors }}
+        </div>
+      {% endif%}
+      {{ field.label }}
+      {{ field }}
+    </div>
+  {% endfor%}
+  <button type="submit" name="button" class="btn btn-primary">Save</button>
+</form>
+
+{% endblock %}
+{% endif %}

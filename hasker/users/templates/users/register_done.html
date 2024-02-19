@@ -1,0 +1,16 @@
+{% extends 'question/base.html' %}
+{% load static %}
+
+{% block title%}
+    {{ title|truncatewords:10 }} - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h1>Welcom!</h1>
+
+<p>
+    You have successfully registered on the site! To log in, you need to log in using this
+    <a href="{% url 'users:login' %}">link</a>
+</p>
+
+{% endblock %}
