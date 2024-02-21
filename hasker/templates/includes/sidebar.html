@@ -1,0 +1,16 @@
+<div class="p-3 sidebar_questions">
+    <h4>Hot questions</h4>
+    {% load sidebar %}
+    {% top_questions as top_q %}
+
+    <ol class="list-unstyled mb-0">
+    {% for q in top_q %}
+        <li>
+            <span>{{ q.user_q_like.all.count }}</span>
+            <a href="{{ q.url }}">
+                {{ q.title|truncatewords:10 }}
+            </a>
+        </li>
+    {% endfor %}
+    </ol>
+</div>

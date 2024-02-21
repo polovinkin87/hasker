@@ -26,10 +26,10 @@ class Tag(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     def get_absolute_url(self):
-        return reverse('tag_detail', kwargs={'slug': self.slug})
+        return reverse('question:tag_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
-        return f'{self.title}'
+        return f'{self.slug}'
 
     def __unicode__(self):
         return self.name
@@ -58,7 +58,7 @@ class Question(AbstractQA):
                                    related_name='user_questions')
 
     def get_absolute_url(self):
-        return reverse('question_detail', kwargs={'slug': self.slug})
+        return reverse('question:question_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
         return f'{self.title}'

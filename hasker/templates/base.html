@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<div class="container">{% include "question/includes/header.html" %}</div>
+<div class="container">{% include "includes/header.html" %}</div>
 
 <div class="container mt-5">
     <div class="mainbar">
@@ -25,11 +25,9 @@
         </div>
     </div>
     <div class="sidebar">
-        <div class="col-6 offset-md-2">
-            {% block trending %}
-                Hot questions
-            {% endblock %}
-        </div>
+        <aside class="col-md-5 blog-sidebar">
+            {% include "includes/sidebar.html" %}
+        </aside>
     </div>
 </div>
 

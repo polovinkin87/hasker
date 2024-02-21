@@ -15,7 +15,7 @@ class LoginUser(LoginView):
     extra_context = {'title': 'Authentication'}
 
     def get_success_url(self):
-        return reverse_lazy('home')
+        return reverse_lazy('question:home')
 
 
 def register(request):

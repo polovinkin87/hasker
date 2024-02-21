@@ -7,8 +7,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import resolve
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView
-from django.db.models import Q
+from django.db.models import Q, Count
 
+from hasker import settings
 from users.models import User
 from .models import Question, Tag, UserQuestionRelation, UserAnswerRelation, Answer
 from .forms import QuestionForm, AnswerForm
@@ -39,13 +40,13 @@ class QuestionDetailView(DetailView):
     context_object_name = 'question'
     slug_url_kwarg = 'slug'
 
-    answers_paginate_by = 5
+    answers_paginate_by = settings.PAGINATE_ANSWERS
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
 
         answers_page = self.request.GET.get("page", 1)
-        answers = self.object.answers.all().order_by('-update')
+        answers = self.object.answers.all().order_by('-created')
         answers_paginator = paginator.Paginator(
             answers, self.answers_paginate_by
         )
@@ -86,7 +87,7 @@ class QuestionDetailView(DetailView):
 class QuestionListView(ListView):
     context_object_name = 'questions'
     template_name = 'question/list.html'
-    paginate_by = 3
+    paginate_by = settings.PAGINATE_QUESTIONS
     search_query = ''
     title = ''
     sort_by_time = False
@@ -107,8 +108,8 @@ class QuestionListView(ListView):
                 tag_title = self.search_query[4:]
                 if not tag_title:
                     return HttpResponseBadRequest('Empty tag')
-                slug = Tag.objects.get(title__icontains=tag_title)
-                return redirect('tag_detail', slug=slug)
+                slug = get_object_or_404(Tag, slug__icontains=tag_title)
+                return redirect('question:tag_detail', slug=slug)
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -121,6 +122,10 @@ class QuestionListView(ListView):
         else:
             questions = Question.objects.all()
 
+        questions = questions.annotate(
+            likes=Count("user_q_like"),
+        ).order_by("-likes", "-created")
+
         return questions
 
     def get_context_data(self, **kwargs):
@@ -131,14 +136,7 @@ class QuestionListView(ListView):
 
 
 def redirect_question(request):
-    return redirect('question_list', permanent=True)
-
-
-# def add_tag(request):
-#     tag_val = request.GET.get('tag', None)
-#     tag_val = tag_val.lower()
-#     new_tag = Tag.objects.get_or_create(title=tag_val)
-#     return HttpResponse(new_tag[0].title)
+    return redirect('question:question_list', permanent=True)
 
 
 def tag_autocomplete(request):
@@ -155,7 +153,7 @@ class QuestionAddLikes(LoginRequiredMixin, View):
         try:
             UserQuestionRelation.objects.get(author=request.user,
                                              question=Question.objects.get(slug=slug).pk)
-            return redirect('question_detail', slug=slug)
+            return redirect('question:question_detail', slug=slug)
         except:
             if Question.objects.get(slug=slug).author == request.user:
                 return HttpResponseForbidden("Can't vote own question/answer")
@@ -163,7 +161,7 @@ class QuestionAddLikes(LoginRequiredMixin, View):
             new_like.author = request.user
             new_like.question = Question.objects.get(slug=slug)
             new_like.save()
-            return redirect('question_detail', slug=slug)
+            return redirect('question:question_detail', slug=slug)
 
 
 class QuestionDelLikes(LoginRequiredMixin, View):
@@ -174,9 +172,9 @@ class QuestionDelLikes(LoginRequiredMixin, View):
             like = UserQuestionRelation.objects.get(author=request.user,
                                                     question=Question.objects.get(slug=slug).pk)
             like.delete()
-            return redirect('question_detail', slug=slug)
+            return redirect('question:question_detail', slug=slug)
         except:
-            return redirect('question_detail', slug=slug)
+            return redirect('question:question_detail', slug=slug)
 
 
 class AnswerAddLikes(LoginRequiredMixin, View):
@@ -186,7 +184,7 @@ class AnswerAddLikes(LoginRequiredMixin, View):
         try:
             UserAnswerRelation.objects.get(author=request.user,
                                              answer=Answer.objects.get(pk=pk).pk)
-            return redirect('question_detail', slug=slug)
+            return redirect('question:question_detail', slug=slug)
         except:
             if Answer.objects.get(pk=pk).author == request.user:
                 return HttpResponseForbidden("Can't vote own question/answer")
@@ -194,7 +192,7 @@ class AnswerAddLikes(LoginRequiredMixin, View):
             new_like.author = request.user
             new_like.answer = Answer.objects.get(pk=pk)
             new_like.save()
-            return redirect('question_detail', slug=slug)
+            return redirect('question:question_detail', slug=slug)
 
 
 class AnswerDelLikes(LoginRequiredMixin, View):
@@ -205,9 +203,9 @@ class AnswerDelLikes(LoginRequiredMixin, View):
             like = UserAnswerRelation.objects.get(author=request.user,
                                                     answer=Answer.objects.get(pk=pk).pk)
             like.delete()
-            return redirect('question_detail', slug=slug)
+            return redirect('question:question_detail', slug=slug)
         except:
-            return redirect('question_detail', slug=slug)
+            return redirect('question:question_detail', slug=slug)
 
 
 def correct_answer(request, pk):

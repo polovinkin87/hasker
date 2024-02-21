@@ -1,4 +1,4 @@
-{% extends 'question/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block title%}
@@ -13,7 +13,7 @@
             <div class="votecell post-layout--left">
                 <div class="voting-container">
                     <button class="vote-up-btn">
-                        <a href="{% url 'question_add_likes' question.slug %}">
+                        <a href="{% url 'question:question_add_likes' question.slug %}">
                             <svg aria-hidden="true" class="svg-icon" width="18" height="18" viewBox="0 0 18 18">
                                 <path d="M1 12h16L9 4l-8 8Z"></path>
                             </svg>
@@ -23,7 +23,7 @@
                         {{ question.user_q_like.all.count }}
                     </div>
                     <button class="vote-up-btn">
-                        <a href="{% url 'question_del_likes' question.slug %}">
+                        <a href="{% url 'question:question_del_likes' question.slug %}">
                             <svg aria-hidden="true" class="svg-icon" width="18" height="18" viewBox="0 0 18 18">
                                 <path d="M1 6h16l-8 8-8-8Z"></path>
                             </svg>
@@ -59,7 +59,7 @@
                 <div class="votecell post-layout--left">
                     <div class="voting-container">
                         <button class="vote-up-btn">
-                            <a href="{% url 'answer_add_likes' question.slug answer.pk %}">
+                            <a href="{% url 'question:answer_add_likes' question.slug answer.pk %}">
                                 <svg aria-hidden="true" class="svg-icon" width="18" height="18" viewBox="0 0 18 18">
                                     <path d="M1 12h16L9 4l-8 8Z"></path>
                                 </svg>
@@ -69,7 +69,7 @@
                             {{ answer.user_a_like.all.count }}
                         </div>
                         <button class="vote-up-btn">
-                            <a href="{% url 'answer_del_likes' question.slug answer.pk %}">
+                            <a href="{% url 'question:answer_del_likes' question.slug answer.pk %}">
                                 <svg aria-hidden="true" class="svg-icon" width="18" height="18" viewBox="0 0 18 18">
                                     <path d="M1 6h16l-8 8-8-8Z"></path>
                                 </svg>
@@ -81,7 +81,7 @@
                                 <path d="m6 14 8 8L30 6v8L14 30l-8-8v-8Z"></path>
                             </svg>
                             {% elif user == question.author %}
-                            <a class="a_correct" href="{% url 'correct_answer' answer.id %}"><svg aria-hidden="true" class="green svg-icon" width="36"
+                            <a class="a_correct" href="{% url 'question:correct_answer' answer.id %}"><svg aria-hidden="true" class="green svg-icon" width="36"
                                     height="36" viewBox="0 0 36 36">
                                     <path d="m6 14 8 8L30 6v8L14 30l-8-8v-8Z"></path>
                                 </svg></a>
@@ -108,7 +108,7 @@
         {% endfor %}
     </div>
 
-    {% include 'question/includes/paginator.html' with page_obj=answers_page_obj %}
+    {% include 'includes/paginator.html' with page_obj=answers_page_obj %}
     {% endif %}
 
     {% if user.is_authenticated and user != question.author %}

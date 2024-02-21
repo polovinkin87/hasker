@@ -1,4 +1,4 @@
-{% extends 'question/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 
@@ -13,17 +13,17 @@
     {{ title|truncatewords:20 }}
   </h1>
   <div class="flex-item-print">
-    <a href="{% url 'question_create' %}" class="ws-nowrap">
+    <a href="{% url 'question:question_create' %}" class="ws-nowrap">
       Ask Question
     </a>
   </div>
 </div>
 
 {% for que in questions %}
-{% include 'question/includes/card.html' %}
+{% include 'includes/card.html' %}
 {% endfor%}
 
-{% include 'question/includes/paginator.html' %}
+{% include 'includes/paginator.html' %}
 
 {% endblock %}
 
